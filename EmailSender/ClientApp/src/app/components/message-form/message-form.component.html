@@ -1,0 +1,15 @@
+<h1>New Message</h1>
+
+<form (ngSubmit)="onSubmit()" ngNativeValidate>
+    <div class="form-group">
+        <label class="form-label" for="subject">Subject</label>
+        <input type="text" id="subject" class="form-control" maxlength="255" required [(ngModel)]="message.subject" name="subject">
+    </div>
+
+    <div class="form-group">
+        <label class="form-label" for="body">Body</label>
+        <textarea id="body" class="form-control" rows="4" required [(ngModel)]="message.body" name="body"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>
+
