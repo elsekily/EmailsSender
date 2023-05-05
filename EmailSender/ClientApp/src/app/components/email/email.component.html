@@ -1,0 +1,26 @@
+<h1>Send Email</h1>
+<div>
+    <div class="input-group mb-3">
+        <input type="text" class="form-control" placeholder="Enter an email" aria-describedby="basic-addon2"
+            [formControl]="emailControl" (keyup.enter)="addEmail()" />
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" (click)="addEmail()"
+                [disabled]="!emailControl.valid">Add</button>
+        </div>
+    </div>
+    <div class="list-container" *ngIf="emails.length > 0">
+        <ul class="list-group">
+            <li *ngFor="let email of emails" class="list-group-item">
+                {{ email }}
+                <button class="btn btn-outline-danger" type="button" (click)="removeEmail(email)">Remove</button>
+            </li>
+        </ul>
+    </div>
+    <button class="btn btn-primary" type="button" (click)="submit()">Submit</button>
+</div>
+<br>
+<div class="container">
+    <h3>{{ message.subject }}</h3>
+    <hr>
+    <p>{{ message.body }}</p>
+</div>

@@ -23,7 +23,6 @@ public class EmailService : IEmailService
     private MimeMessage BuildMimeMessage(EmailResource emailResource)
     {
         var email = new MimeMessage();
-        System.Console.WriteLine(configuration["emailConfiguration:Username"]);
         email.From.Add(MailboxAddress.Parse(configuration["emailConfiguration:Username"]));
         email.To.AddRange(emailResource.EmailAddresses.Select(e => new MailboxAddress("", e)));
         email.Subject = emailResource.Message.Subject;
