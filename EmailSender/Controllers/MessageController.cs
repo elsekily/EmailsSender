@@ -44,9 +44,6 @@ public class MessageController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateMessage([FromBody] MessageSaveResource messageResource)
     {
-        if (!ModelState.IsValid)
-            return BadRequest();
-
         var message = mapper.Map<MessageSaveResource, Message>(messageResource);
         await repository.Add(message);
 
