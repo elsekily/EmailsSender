@@ -69,7 +69,7 @@ export class EmailComponent {
 
     },
       (error) => {
-        alert('Request failed!');
+        alert('Error: ' + error.error);
       }
     );
 

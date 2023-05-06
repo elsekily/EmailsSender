@@ -16,7 +16,7 @@
             </li>
         </ul>
     </div>
-    <button class="btn btn-primary" type="button" (click)="submit()">Submit</button>
+    <button class="btn btn-primary" type="button" (click)="submit()" [disabled]="emails.length===0">Send</button>
 </div>
 <br>
 <div class="container">
