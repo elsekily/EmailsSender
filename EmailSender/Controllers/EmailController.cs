@@ -1,8 +1,9 @@
-using AutoMapper;
 using EmailSender.Core;
 using EmailSender.Entities.Models;
 using EmailSender.Entities.Resources;
 using Microsoft.AspNetCore.Mvc;
+using MimeKit;
+using MimeKit.Text;
 
 namespace EmailSender.Controllers;
 
@@ -12,11 +13,13 @@ public class EmailController : ControllerBase
 {
     private readonly IEmailService emailService;
     private readonly IMessageRepository repository;
+    private readonly IConfiguration configuration;
 
-    public EmailController(IEmailService emailService, IMessageRepository messageRepository)
+    public EmailController(IEmailService emailService, IMessageRepository messageRepository, IConfiguration configuration)
     {
         this.emailService = emailService;
         this.repository = messageRepository;
+        this.configuration = configuration;
     }
     [HttpPost]
     public async Task<IActionResult> SendEmail([FromBody] MessageRecipientsResource messageRecipients)
@@ -26,18 +29,22 @@ public class EmailController : ControllerBase
         if (message == null)
             return BadRequest();
 
-        var email = BuildEmailResource(messageRecipients, message);
+        var mimeMessage = BuildMimeMessage(messageRecipients, message);
+        var sendResult = await emailService.SendEmail(mimeMessage);
 
-        emailService.SendEmail(email);
+        if (!sendResult)
+            return StatusCode(503, "Service Unavailable. Please try again later.");
+
         return Ok();
     }
 
-    private EmailResource BuildEmailResource(MessageRecipientsResource messageRecipients, Message message)
+    private MimeMessage BuildMimeMessage(MessageRecipientsResource messageRecipients, Message message)
     {
-        return new EmailResource()
-        {
-            Message = message,
-            EmailAddresses = messageRecipients.RecipientEmailAddresses
-        };
+        var email = new MimeMessage();
+        email.From.Add(MailboxAddress.Parse(configuration["emailConfiguration:Username"]));
+        email.To.AddRange(messageRecipients.RecipientEmailAddresses.Select(e => new MailboxAddress("", e)));
+        email.Subject = message.Subject;
+        email.Body = new TextPart(TextFormat.Plain) { Text = message.Body };
+        return email;
     }
 }

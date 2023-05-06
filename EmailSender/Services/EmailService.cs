@@ -14,35 +14,32 @@ public class EmailService : IEmailService
     {
         this.configuration = configuration;
     }
-    public void SendEmail(EmailResource emailResource)
-    {
-        var email = BuildMimeMessage(emailResource);
-        SendEmailWithSmtpClient(email);
-    }
-
-    private MimeMessage BuildMimeMessage(EmailResource emailResource)
-    {
-        var email = new MimeMessage();
-        email.From.Add(MailboxAddress.Parse(configuration["emailConfiguration:Username"]));
-        email.To.AddRange(emailResource.EmailAddresses.Select(e => new MailboxAddress("", e)));
-        email.Subject = emailResource.Message.Subject;
-        email.Body = new TextPart(TextFormat.Plain) { Text = emailResource.Message.Body };
-        return email;
-    }
-
-    private void SendEmailWithSmtpClient(MimeMessage email)
+    public async Task<bool> SendEmail(MimeMessage email)
     {
         using (var smtp = new SmtpClient())
         {
-            smtp.Connect(configuration["emailConfiguration:SmtpServer"],
-                    int.Parse(configuration["emailConfiguration:Port"]),
-                    SecureSocketOptions.StartTls);
+            try
+            {
+                await smtp.ConnectAsync(configuration["emailConfiguration:SmtpServer"],
+                                        int.Parse(configuration["emailConfiguration:Port"]),
+                                        SecureSocketOptions.StartTls);
 
-            smtp.Authenticate(configuration["emailConfiguration:Username"],
-                    configuration["emailConfiguration:Password"]);
+                await smtp.AuthenticateAsync(configuration["emailConfiguration:Username"],
+                                       configuration["emailConfiguration:Password"]);
 
-            smtp.Send(email);
-            smtp.Disconnect(true);
+                await smtp.SendAsync(email);
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                System.Console.WriteLine("Error : {0}", e);
+                return false;
+            }
+            finally
+            {
+                smtp.Disconnect(true);
+            }
         }
     }
 }

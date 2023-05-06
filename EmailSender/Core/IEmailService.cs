@@ -1,9 +1,10 @@
 using EmailSender.Entities.Models;
 using EmailSender.Entities.Resources;
+using MimeKit;
 
 namespace EmailSender.Core;
 
 public interface IEmailService
 {
-    void SendEmail(EmailResource email);
+    Task<bool> SendEmail(MimeMessage email);
 }
