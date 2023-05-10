@@ -16,6 +16,8 @@ public class EmailService : IEmailService
     }
     public async Task<bool> SendEmail(MimeMessage email)
     {
+        email.From.Add(MailboxAddress.Parse(configuration["emailConfiguration:Username"]));
+
         using (var smtp = new SmtpClient())
         {
             try

@@ -1,3 +1,4 @@
+using AutoMapper;
 using EmailSender.Core;
 using EmailSender.Entities.Models;
 using EmailSender.Entities.Resources;
@@ -13,13 +14,13 @@ public class EmailController : ControllerBase
 {
     private readonly IEmailService emailService;
     private readonly IMessageRepository repository;
-    private readonly IConfiguration configuration;
+    private readonly IMapper mapper;
 
-    public EmailController(IEmailService emailService, IMessageRepository messageRepository, IConfiguration configuration)
+    public EmailController(IEmailService emailService, IMessageRepository messageRepository, IMapper mapper)
     {
         this.emailService = emailService;
         this.repository = messageRepository;
-        this.configuration = configuration;
+        this.mapper = mapper;
     }
     [HttpPost]
     public async Task<IActionResult> SendEmail([FromBody] MessageRecipientsResource messageRecipients)
@@ -29,22 +30,14 @@ public class EmailController : ControllerBase
         if (message == null)
             return BadRequest();
 
-        var mimeMessage = BuildMimeMessage(messageRecipients, message);
+        var mimeMessage = mapper.Map<MessageRecipientsResource, MimeMessage>(messageRecipients);
+        mapper.Map<Message, MimeMessage>(message, mimeMessage);
+
         var sendResult = await emailService.SendEmail(mimeMessage);
 
         if (!sendResult)
             return StatusCode(503, "Service Unavailable. Please try again later.");
 
         return Ok();
-    }
-
-    private MimeMessage BuildMimeMessage(MessageRecipientsResource messageRecipients, Message message)
-    {
-        var email = new MimeMessage();
-        email.From.Add(MailboxAddress.Parse(configuration["emailConfiguration:Username"]));
-        email.To.AddRange(messageRecipients.RecipientEmailAddresses.Select(e => new MailboxAddress("", e)));
-        email.Subject = message.Subject;
-        email.Body = new TextPart(TextFormat.Plain) { Text = message.Body };
-        return email;
     }
 }
