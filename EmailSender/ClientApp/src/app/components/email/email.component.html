@@ -2,13 +2,13 @@
 <div>
     <div class="input-group mb-3">
         <input type="text" class="form-control" placeholder="Enter an email" aria-describedby="basic-addon2"
-            [formControl]="emailControl" (keyup.enter)="addEmail()" />
+            [(ngModel)]="email" (keyup.enter)="addEmail()" />
         <div class="input-group-append">
             <button class="btn btn-outline-secondary" type="button" (click)="addEmail()"
-                [disabled]="!emailControl.valid">Add</button>
+                [disabled]="!isValidEmail(email)">Add</button>
         </div>
     </div>
-    <div class="list-container" *ngIf="emails.length > 0">
+    <div class="list-container border border-dark">
         <ul class="list-group">
             <li *ngFor="let email of emails" class="list-group-item">
                 {{ email }}

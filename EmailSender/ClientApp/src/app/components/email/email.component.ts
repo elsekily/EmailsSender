@@ -12,7 +12,7 @@ import { MessageRecipients } from 'src/app/models/MessageRecipients';
   styleUrls: ['./email.component.css']
 })
 export class EmailComponent {
-  emailControl = new FormControl('', [Validators.required, Validators.email]);
+  email: string = "";
   emails: string[] = [];
   messageId: number = 0;
   message: message = { id: 0, subject: '', body: '' };
@@ -31,12 +31,11 @@ export class EmailComponent {
    }
   
   addEmail() {
-    const email = this.emailControl.value;
-    
-    if (!email) {
+     
+    if (!this.email) {
       return;
     }
-    const trimmedEmail = email.trim();
+    const trimmedEmail = this.email.trim();
     
     if (!trimmedEmail) {
       return;
@@ -47,7 +46,7 @@ export class EmailComponent {
     if (!this.emails.includes(trimmedEmail)) {
       this.emails.push(trimmedEmail);
     }
-    this.emailControl.reset();
+    this.email = "";
   }
   
   isValidEmail(email: string): boolean {

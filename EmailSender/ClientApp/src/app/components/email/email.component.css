@@ -4,3 +4,8 @@
     overflow-y: auto;
     /* Enable vertical scrolling */
 }
+
+.btn-primary {
+    margin: 2px;
+    margin-top: 8px;
+}
